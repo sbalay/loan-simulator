@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components/macro";
 import { useCounter } from "react-use";
 
-export function SimulationForm() {
+export function SimulationForm({ onCreateSimulation }) {
   const { register, watch } = useForm();
   const [periodsCount, { dec: removePeriod, inc: addPeriod }] = useCounter(0);
 
