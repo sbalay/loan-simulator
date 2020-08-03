@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components/macro";
 import { useCounter } from "react-use";
 
-export function RepaySimulationForm() {
+export function SimulationForm() {
   const { register, watch } = useForm();
   const [periodsCount, { dec: removePeriod, inc: addPeriod }] = useCounter(0);
 
@@ -11,7 +11,7 @@ export function RepaySimulationForm() {
   const numericalFormValues = Object.fromEntries(
     Object.entries(formValues).map(([key, value]) => [key, parseFloat(value)])
   );
-  console.log(numericalFormValues);
+
   const { amount, interest, repayPeriod, repayAmount, amortization } = numericalFormValues;
   const ready = Boolean(amount && interest && repayPeriod && repayAmount && amortization);
 
@@ -30,7 +30,7 @@ export function RepaySimulationForm() {
     <div>
       <form>
         <div>
-          <label htmlFor="amount">Total amount to repaay</label>
+          <label htmlFor="amount">Total amount to repay</label>
           <input name="amount" defaultValue="2635000" ref={register} />
         </div>
         <div>
