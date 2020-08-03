@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components/macro";
 import { useCounter } from "react-use";
-import { useMemo } from "react";
 
 export function RepaySimulationForm() {
   const { register, watch } = useForm();
