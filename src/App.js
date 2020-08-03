@@ -3,7 +3,7 @@ import { useLocalStorage } from "react-use";
 import styled from "styled-components/macro";
 
 import "./App.css";
-import { SimulationForm } from "./screens/simulation-form";
+import { SimulationForm } from "./screens/simulation-form/index";
 import { SimulationsPanel } from "./screens/simulations-panel";
 
 const AppContainer = styled.div({
