@@ -1,82 +1,68 @@
-import React, { useMemo } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { SimulationTable } from "./simulation-table";
 import styled from "styled-components/macro";
-import { useCounter } from "react-use";
+
+const InputGroup = styled.div({
+  display: "flex",
+  alignItems: "center",
+});
+
+const InputLabel = styled.label({
+  width: 390,
+});
+
+const Input = styled.input({
+  height: 32,
+  textAlign: "right",
+});
 
 export function RepaySimulationForm() {
   const { register, watch } = useForm();
-  const [periodsCount, { dec: removePeriod, inc: addPeriod }] = useCounter(0);
+  const [repayments, setRepayments] = useState([]);
 
   const formValues = watch();
   const numericalFormValues = Object.fromEntries(
     Object.entries(formValues).map(([key, value]) => [key, parseFloat(value)])
   );
-  console.log(numericalFormValues);
   const { amount, interest, repayPeriod, repayAmount, amortization } = numericalFormValues;
   const ready = Boolean(amount && interest && repayPeriod && repayAmount && amortization);
 
-  const periodIterator = useMemo(() => new Array(periodsCount).fill(), [periodsCount]);
-  const periodSettings = periodIterator.map((_, periodIndex) => {
-    const alreadyAmortized = (amount / 12) * (amortization / 100) * repayPeriod * periodIndex;
-    const alreadyRepayed = repayAmount * periodIndex;
-
-    const toRepay = amount - alreadyAmortized - alreadyRepayed;
-    const monthlyInterest = (toRepay / 12) * (interest / 100);
-    const periodInterest = monthlyInterest * repayPeriod;
-    return { toRepay, monthlyInterest, periodInterest };
-  });
+  const monthlyAmortization = (amount / 12) * (amortization / 100);
 
   return (
     <div>
-      <form>
-        <div>
-          <label htmlFor="amount">Total amount to repaay</label>
-          <input name="amount" defaultValue="2635000" ref={register} />
-        </div>
-        <div>
-          <label htmlFor="amortization">Yearly amortization</label>
-          <input name="amortization" defaultValue="2" ref={register} />
-        </div>
-        <div>
-          <label htmlFor="interest">Interest rate</label>
-          <input name="interest" defaultValue="1.82" ref={register} />
-        </div>
-        <div>
-          <label htmlFor="repayPeriod">Period length (in months)</label>
-          <input name="repayPeriod" defaultValue="3" ref={register} />
-        </div>
-        <div>
-          <label htmlFor="repayAmount">Amount repayed each period</label>
-          <input name="repayAmount" defaultValue="100000" ref={register} />
-        </div>
+      <form style={{ padding: 32 }}>
+        <InputGroup>
+          <InputLabel htmlFor="amount">Total amount to repaay</InputLabel>
+          <Input name="amount" defaultValue="2635000" ref={register} />
+        </InputGroup>
+        <InputGroup>
+          <InputLabel htmlFor="amortization">Yearly amortization</InputLabel>
+          <Input name="amortization" defaultValue="2" ref={register} />
+        </InputGroup>
+        <InputGroup>
+          <InputLabel htmlFor="interest">Interest rate</InputLabel>
+          <Input name="interest" defaultValue="1.82" ref={register} />
+        </InputGroup>
+        <InputGroup>
+          <InputLabel htmlFor="repayPeriod">Period length (in months)</InputLabel>
+          <Input name="repayPeriod" defaultValue="3" ref={register} />
+        </InputGroup>
+        <InputGroup>
+          <InputLabel htmlFor="repayAmount">Amount repayed each period</InputLabel>
+          <Input name="repayAmount" defaultValue="100000" ref={register} />
+        </InputGroup>
       </form>
-      <div css={{ display: "flex", margin: 16 }}>
-        <button onClick={() => removePeriod()}>Remove period</button>
-        <button onClick={() => addPeriod()}>Add period</button>
-      </div>
-      {ready &&
-        periodSettings.map(({ toRepay, monthlyInterest, periodInterest }, i) => {
-          const acumInterest = periodSettings
-            .slice(0, i + 1)
-            .reduce((acum, { periodInterest }) => acum + periodInterest, 0);
-          return (
-            <div key={i}>
-              <p>Period {i}</p>
-              <p>
-                To repay: <code>{toRepay}</code>
-              </p>
-              <p>
-                Monthly interest: <code>{monthlyInterest}</code>
-              </p>
-              <p>
-                Period interest: <code>{periodInterest}</code>
-              </p>
-              <p>
-                Accumulated interest: <code>{acumInterest}</code>
-              </p>
-            </div>
-          );
-        })}
+
+      {ready && (
+        <SimulationTable
+          amount={amount}
+          interest={interest}
+          monthlyAmortization={monthlyAmortization}
+          repayments={repayments}
+        />
+      )}
     </div>
   );
 }
