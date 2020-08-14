@@ -18,7 +18,9 @@ const Input = styled.input({
 });
 
 export function RepaySimulationForm() {
-  const { register, watch } = useForm();
+  const { register, watch } = useForm({
+    defaultValues: { amount: 2635000, amortization: 2, interest: 1.82, repayPeriod: 3 },
+  });
 
   const formValues = watch();
   const numericalFormValues = Object.fromEntries(
@@ -34,19 +36,19 @@ export function RepaySimulationForm() {
       <form style={{ padding: 32 }}>
         <InputGroup>
           <InputLabel htmlFor="amount">Total amount to repaay</InputLabel>
-          <Input name="amount" defaultValue="2635000" ref={register} />
+          <Input name="amount" ref={register} />
         </InputGroup>
         <InputGroup>
           <InputLabel htmlFor="amortization">Yearly amortization</InputLabel>
-          <Input name="amortization" defaultValue="2" ref={register} />
+          <Input name="amortization" ref={register} />
         </InputGroup>
         <InputGroup>
           <InputLabel htmlFor="interest">Interest rate</InputLabel>
-          <Input name="interest" defaultValue="1.82" ref={register} />
+          <Input name="interest" ref={register} />
         </InputGroup>
         <InputGroup>
           <InputLabel htmlFor="repayPeriod">Period length (in months)</InputLabel>
-          <Input name="repayPeriod" defaultValue="3" ref={register} />
+          <Input name="repayPeriod" ref={register} />
         </InputGroup>
       </form>
 
