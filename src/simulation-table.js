@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { useTable } from "react-table";
 import styled from "styled-components/macro";
 
@@ -21,6 +21,10 @@ export function SimulationTable({ settings, setTotalInterest }) {
     },
     [repayments]
   );
+
+  useEffect(() => {
+    setRepayments(new Array(36).fill(0));
+  }, [settings.repayPeriod]);
 
   const { amount, interest, amortization, repayPeriod } = settings;
   const monthlyAmortization = (amount / 12) * (amortization / 100);
