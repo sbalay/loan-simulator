@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { SimulationTable } from "./simulation-table";
 import styled from "styled-components/macro";
@@ -19,14 +19,13 @@ const Input = styled.input({
 
 export function RepaySimulationForm() {
   const { register, watch } = useForm();
-  const [repayments, setRepayments] = useState([]);
 
   const formValues = watch();
   const numericalFormValues = Object.fromEntries(
     Object.entries(formValues).map(([key, value]) => [key, parseFloat(value)])
   );
-  const { amount, interest, repayPeriod, repayAmount, amortization } = numericalFormValues;
-  const ready = Boolean(amount && interest && repayPeriod && repayAmount && amortization);
+  const { amount, interest, repayPeriod, amortization } = numericalFormValues;
+  const ready = Boolean(amount && interest && repayPeriod && amortization);
 
   const monthlyAmortization = (amount / 12) * (amortization / 100);
 
@@ -49,10 +48,6 @@ export function RepaySimulationForm() {
           <InputLabel htmlFor="repayPeriod">Period length (in months)</InputLabel>
           <Input name="repayPeriod" defaultValue="3" ref={register} />
         </InputGroup>
-        <InputGroup>
-          <InputLabel htmlFor="repayAmount">Amount repayed each period</InputLabel>
-          <Input name="repayAmount" defaultValue="100000" ref={register} />
-        </InputGroup>
       </form>
 
       {ready && (
@@ -60,7 +55,7 @@ export function RepaySimulationForm() {
           amount={amount}
           interest={interest}
           monthlyAmortization={monthlyAmortization}
-          repayments={repayments}
+          repayPeriod={repayPeriod}
         />
       )}
     </div>
