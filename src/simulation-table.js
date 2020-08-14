@@ -12,7 +12,7 @@ const Input = styled.input({
   textAlign: "right",
 });
 
-export function SimulationTable({ settings }) {
+export function SimulationTable({ settings, setTotalInterest }) {
   const [repayments, setRepayments] = useState(new Array(36).fill(0));
 
   const handleRepayment = useCallback(
@@ -25,25 +25,28 @@ export function SimulationTable({ settings }) {
   const { amount, interest, amortization, repayPeriod } = settings;
   const monthlyAmortization = (amount / 12) * (amortization / 100);
 
-  const data = useMemo(
-    () =>
-      new Array(36).fill().map((_, month) => {
-        const alreadyAmortized = monthlyAmortization * month;
-        const alreadyRepayed = repayments.slice(0, month).reduce((total, val) => total + val, 0);
+  const data = useMemo(() => {
+    let totalInterest = 0;
 
-        const toRepay = amount - alreadyAmortized - alreadyRepayed;
-        const monthlyInterest = (toRepay / 12) * (interest / 100);
-        return {
-          toRepay: toRepay.toFixed(2),
-          monthlyInterest: monthlyInterest.toFixed(2),
-          alreadyAmortized: alreadyAmortized.toFixed(2),
-          alreadyRepayed: alreadyRepayed.toFixed(2),
-          cost: (monthlyAmortization + monthlyInterest).toFixed(2),
-        };
-      }),
+    const rows = new Array(36).fill().map((_, month) => {
+      const alreadyAmortized = monthlyAmortization * month;
+      const alreadyRepayed = repayments.slice(0, month).reduce((total, val) => total + val, 0);
 
-    [amount, interest, monthlyAmortization, repayments]
-  );
+      const toRepay = amount - alreadyAmortized - alreadyRepayed;
+      const monthlyInterest = (toRepay / 12) * (interest / 100);
+      totalInterest += monthlyInterest;
+      return {
+        toRepay: toRepay.toFixed(2),
+        monthlyInterest: monthlyInterest.toFixed(2),
+        alreadyAmortized: alreadyAmortized.toFixed(2),
+        alreadyRepayed: alreadyRepayed.toFixed(2),
+        cost: (monthlyAmortization + monthlyInterest).toFixed(2),
+      };
+    });
+
+    setTotalInterest(totalInterest.toFixed(2));
+    return rows;
+  }, [amount, interest, monthlyAmortization, repayments, setTotalInterest]);
 
   const monthlyAmortizationStr = monthlyAmortization.toFixed(2);
 
