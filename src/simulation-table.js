@@ -12,7 +12,7 @@ const Input = styled.input({
   textAlign: "right",
 });
 
-export function SimulationTable({ amount, interest, monthlyAmortization, repayPeriod }) {
+export function SimulationTable({ settings }) {
   const [repayments, setRepayments] = useState(new Array(36).fill(0));
 
   const handleRepayment = useCallback(
@@ -22,32 +22,28 @@ export function SimulationTable({ amount, interest, monthlyAmortization, repayPe
     [repayments]
   );
 
-  const data = useMemo(() => {
-    const settings = new Array(36).fill().map((_, month) => {
-      const alreadyAmortized = monthlyAmortization * month;
-      const alreadyRepayed = repayments.slice(0, month).reduce((total, val) => total + val, 0);
+  const { amount, interest, amortization, repayPeriod } = settings;
+  const monthlyAmortization = (amount / 12) * (amortization / 100);
 
-      const toRepay = amount - alreadyAmortized - alreadyRepayed;
-      const monthlyInterest = (toRepay / 12) * (interest / 100);
-      return { toRepay, monthlyInterest, alreadyAmortized, alreadyRepayed };
-    });
+  const data = useMemo(
+    () =>
+      new Array(36).fill().map((_, month) => {
+        const alreadyAmortized = monthlyAmortization * month;
+        const alreadyRepayed = repayments.slice(0, month).reduce((total, val) => total + val, 0);
 
-    const totalsRow = settings.reduce(
-      (totals, { monthlyInterest }) => ({
-        ...totals,
-        monthlyInterest: monthlyInterest + totals.monthlyInterest,
+        const toRepay = amount - alreadyAmortized - alreadyRepayed;
+        const monthlyInterest = (toRepay / 12) * (interest / 100);
+        return {
+          toRepay: toRepay.toFixed(2),
+          monthlyInterest: monthlyInterest.toFixed(2),
+          alreadyAmortized: alreadyAmortized.toFixed(2),
+          alreadyRepayed: alreadyRepayed.toFixed(2),
+          cost: (monthlyAmortization + monthlyInterest).toFixed(2),
+        };
       }),
-      { toRepay: 0, monthlyInterest: 0, alreadyAmortized: 0, alreadyRepayed: 0 }
-    );
 
-    return [...settings, totalsRow].map((val) => ({
-      toRepay: val.toRepay.toFixed(2),
-      monthlyInterest: val.monthlyInterest.toFixed(2),
-      alreadyAmortized: val.alreadyAmortized.toFixed(2),
-      alreadyRepayed: val.alreadyRepayed.toFixed(2),
-      cost: (val.monthlyInterest + monthlyAmortization).toFixed(2),
-    }));
-  }, [amount, interest, monthlyAmortization, repayments]);
+    [amount, interest, monthlyAmortization, repayments]
+  );
 
   const monthlyAmortizationStr = monthlyAmortization.toFixed(2);
 
